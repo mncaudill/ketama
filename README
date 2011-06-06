@@ -6,7 +6,7 @@ Author: Nolan Caudill (nolan@nolancaudill.com)
 Date: 2011-06-04
 =====================================
 
-This is small library to do libketama-style consistent hashing. 
+This is a small library to do libketama-style consistent hashing. 
 
 A common pattern in a caching cluster (eg, memcache) is to take the hash of the key modded by
 the number of cache servers to determine which node to cache to. This provides a distribution as 
