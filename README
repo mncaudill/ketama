@@ -1,0 +1,26 @@
+=====================================
+ketama.go
+libketama-style consistent hashing in Go
+
+Author: Nolan Caudill (nolan@nolancaudill.com)
+Date: 2011-06-04
+=====================================
+
+This is small library to do libketama-style consistent hashing. 
+
+A common pattern in a caching cluster (eg, memcache) is to take the hash of the key modded by
+the number of cache servers to determine which node to cache to. This provides a distribution as 
+even as your hashing algorithm but whenever a server is added or removed, all your keys have to rehash.
+
+With consistent hashing, in the event of the removal of a cache node, all keys that were hashing to one 
+node to (in theory) evenly distribute to the other cache nodes. The addition of a cache node works in a 
+similar manner in that all nodes will evenly give up a portion of their cache keys to the new node.
+
+This is a first pass at this and things seems to work at first glance but consider this alpha.
+
+===========
+USAGE
+===========
+
+ketama_test.go provides a working example of how to use this library.
+
