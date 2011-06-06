@@ -30,6 +30,9 @@ func NewRing(n int) *hashRing {
 	return h
 }
 
+// Adds a new node to a hash ring
+// n: name of the server
+// s: multiplier for default number of ticks (useful when one cache node has more resources, like RAM, than another)
 func (h *hashRing) AddNode(n string, s int) {
 	tSpots := h.defaultSpots * s
 	hash := sha1.New()
