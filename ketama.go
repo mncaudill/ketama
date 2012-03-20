@@ -38,7 +38,7 @@ func (h *hashRing) AddNode(n string, s int) {
 	hash := sha1.New()
 	for i := 1; i <= tSpots; i++ {
 		hash.Write([]byte(n + ":" + strconv.Itoa(i)))
-		hashBytes := hash.Sum()
+		hashBytes := hash.Sum(nil)
 
 		n := &node{
 			node: n,
@@ -58,7 +58,7 @@ func (h *hashRing) Bake() {
 func (h *hashRing) Hash(s string) string {
 	hash := sha1.New()
 	hash.Write([]byte(s))
-	hashBytes := hash.Sum()
+	hashBytes := hash.Sum(nil)
 	v := uint(hashBytes[19]) | uint(hashBytes[18])<<8 | uint(hashBytes[17])<<16 | uint(hashBytes[16])<<24
 	i := sort.Search(h.length, func(i int) bool { return h.ticks[i].hash >= v })
 

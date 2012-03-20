@@ -2,8 +2,8 @@ package ketama
 
 import (
 	"fmt"
-	"testing"
 	"strconv"
+	"testing"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -24,7 +24,7 @@ func TestGetInfo(t *testing.T) {
 
 	m := make(map[string]int)
 	for i := 0; i < 1e6; i++ {
-		m[ring.Hash("test value"+strconv.Uitoa(uint(i)))]++
+		m[ring.Hash("test value"+strconv.FormatUint(uint64(i), 10))]++
 	}
 
 	for k, _ := range nodes {
