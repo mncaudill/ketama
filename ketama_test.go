@@ -27,7 +27,7 @@ func TestGetInfo(t *testing.T) {
 		m[ring.Hash("test value"+strconv.FormatUint(uint64(i), 10))]++
 	}
 
-	for k, _ := range nodes {
+	for k := range nodes {
 		fmt.Println(k, m[k])
 	}
 }
