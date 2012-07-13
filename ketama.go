@@ -24,10 +24,10 @@ type hashRing struct {
 	length       int
 }
 
-func NewRing(n int) *hashRing {
-	h := new(hashRing)
+func NewRing(n int) (h *hashRing) {
+	h = new(hashRing)
 	h.defaultSpots = n
-	return h
+	return
 }
 
 // Adds a new node to a hash ring
