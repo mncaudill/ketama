@@ -6,6 +6,24 @@ import (
 	"strconv"
 )
 
+// HashRing is the interface that describes HashRing implementation behavior.
+type HashRing interface {
+	// Add takes a single element and multiplier. The Bake method must be called when adding elements is complete.
+	Add(element string, multiplier int)
+	// AddAll adds all of the elements of a given string to int map. It then calls the Bake method.
+	AddAll(elements map[string]int)
+	// Bake finalizes the internal structures used to prepare the HashRing for reads.
+	Bake()
+	// Hash looks up the element to be used for a given key.
+	Hash(key string) string
+}
+
+type ketamaHashRing struct {
+	defaultSpots int
+	ticks        tickArray
+	length       int
+}
+
 type node struct {
 	node string
 	hash uint
@@ -13,35 +31,44 @@ type node struct {
 
 type tickArray []node
 
-func (p tickArray) Len() int           { return len(p) }
-func (p tickArray) Less(i, j int) bool { return p[i].hash < p[j].hash }
-func (p tickArray) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p tickArray) Sort()              { sort.Sort(p) }
-
-type hashRing struct {
-	defaultSpots int
-	ticks        tickArray
-	length       int
+func NewRing(n int) HashRing {
+	hashRing := new(ketamaHashRing)
+	hashRing.defaultSpots = n
+	return hashRing
 }
 
-func NewRing(n int) (h *hashRing) {
-	h = new(hashRing)
-	h.defaultSpots = n
-	return
+func (p tickArray) Len() int {
+	return len(p)
 }
 
-// Adds a new node to a hash ring
-// n: name of the server
-// s: multiplier for default number of ticks (useful when one cache node has more resources, like RAM, than another)
-func (h *hashRing) AddNode(n string, s int) {
-	tSpots := h.defaultSpots * s
+func (p tickArray) Less(i, j int) bool {
+	return p[i].hash < p[j].hash
+}
+
+func (p tickArray) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p tickArray) Sort() {
+	sort.Sort(p)
+}
+
+func (h *ketamaHashRing) AddAll(elements map[string]int) {
+	for element, multiplier := range elements {
+		h.Add(element, multiplier)
+	}
+	h.Bake()
+}
+
+func (h *ketamaHashRing) Add(element string, multiplier int) {
+	tSpots := h.defaultSpots * multiplier
 	hash := sha1.New()
 	for i := 1; i <= tSpots; i++ {
-		hash.Write([]byte(n + ":" + strconv.Itoa(i)))
+		hash.Write([]byte(element + ":" + strconv.Itoa(i)))
 		hashBytes := hash.Sum(nil)
 
 		n := &node{
-			node: n,
+			node: element,
 			hash: uint(hashBytes[19]) | uint(hashBytes[18])<<8 | uint(hashBytes[17])<<16 | uint(hashBytes[16])<<24,
 		}
 
@@ -50,14 +77,14 @@ func (h *hashRing) AddNode(n string, s int) {
 	}
 }
 
-func (h *hashRing) Bake() {
+func (h *ketamaHashRing) Bake() {
 	h.ticks.Sort()
 	h.length = len(h.ticks)
 }
 
-func (h *hashRing) Hash(s string) string {
+func (h *ketamaHashRing) Hash(key string) string {
 	hash := sha1.New()
-	hash.Write([]byte(s))
+	hash.Write([]byte(key))
 	hashBytes := hash.Sum(nil)
 	v := uint(hashBytes[19]) | uint(hashBytes[18])<<8 | uint(hashBytes[17])<<16 | uint(hashBytes[16])<<24
 	i := sort.Search(h.length, func(i int) bool { return h.ticks[i].hash >= v })
