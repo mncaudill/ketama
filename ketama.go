@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-// HashRing is the interface that describes HashRing implementation behavior.
+// HashRing is the interface that defines a hashring like behavior. This interface primarily exists to simplify using this library and it's data structures in other data structures and tests.
 type HashRing interface {
 	// Add takes a single element and multiplier. The Bake method must be called when adding elements is complete.
 	Add(element string, multiplier int)
@@ -31,6 +31,7 @@ type node struct {
 
 type tickArray []node
 
+// NewRing creates a new Ketama-like hash ring structure.
 func NewRing(n int) HashRing {
 	hashRing := new(ketamaHashRing)
 	hashRing.defaultSpots = n
