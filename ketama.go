@@ -18,22 +18,23 @@ func (p tickArray) Less(i, j int) bool { return p[i].hash < p[j].hash }
 func (p tickArray) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p tickArray) Sort()              { sort.Sort(p) }
 
-type hashRing struct {
+type Ring struct {
 	defaultSpots int
 	ticks        tickArray
 	length       int
 }
 
-func NewRing(n int) (h *hashRing) {
-	h = new(hashRing)
+func NewRing(n int) *Ring {
+	h := new(Ring)
 	h.defaultSpots = n
-	return
+
+	return h
 }
 
 // Adds a new node to a hash ring
 // n: name of the server
 // s: multiplier for default number of ticks (useful when one cache node has more resources, like RAM, than another)
-func (h *hashRing) AddNode(n string, s int) {
+func (h *Ring) AddNode(n string, s int) {
 	tSpots := h.defaultSpots * s
 	hash := sha1.New()
 	for i := 1; i <= tSpots; i++ {
@@ -50,12 +51,12 @@ func (h *hashRing) AddNode(n string, s int) {
 	}
 }
 
-func (h *hashRing) Bake() {
+func (h *Ring) Bake() {
 	h.ticks.Sort()
 	h.length = len(h.ticks)
 }
 
-func (h *hashRing) Hash(s string) string {
+func (h *Ring) Hash(s string) string {
 	hash := sha1.New()
 	hash.Write([]byte(s))
 	hashBytes := hash.Sum(nil)
