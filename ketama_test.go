@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGetInfo(t *testing.T) {
+func TestRing(t *testing.T) {
 	ring := NewRing(200)
 
 	nodes := map[string]int{
